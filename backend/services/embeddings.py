@@ -1,21 +1,14 @@
-from typing import List
-from openai import OpenAI
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+from sentence_transformers import SentenceTransformer
 
 
-def generate_embeddings(chunks: List[str]) -> List[List[float]]:
+# Load once (important for performance)
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+
+def generate_embeddings(chunks: list[str]) -> list[list[float]]:
     """
-    Generate embeddings for a list of text chunks.
+    Generate embeddings locally using SentenceTransformers.
+    No API key required.
     """
-    response = client.embeddings.create(
-        model="text-embedding-3-small",
-        input=chunks
-    )
-
-    embeddings = [item.embedding for item in response.data]
-    return embeddings
+    embeddings = model.encode(chunks, convert_to_numpy=True)
+    return embeddings.tolist()

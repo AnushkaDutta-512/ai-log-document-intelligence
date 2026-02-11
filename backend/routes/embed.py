@@ -9,17 +9,20 @@ router = APIRouter()
 @router.get("/embed")
 def embed_document(file_path: str):
     try:
+        # Step 1: extract text
         text = extract_text_from_file(file_path)
+
+        # Step 2: chunk text
         chunks = chunk_text(text)
+
+        # Step 3: generate embeddings
         embeddings = generate_embeddings(chunks)
 
         return {
             "file_path": file_path,
             "total_chunks": len(chunks),
-            "embedding_dimension": len(embeddings[0]),
+            "embedding_dimension": len(embeddings[0]) if embeddings else 0
         }
 
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
