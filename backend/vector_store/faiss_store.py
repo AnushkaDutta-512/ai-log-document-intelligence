@@ -28,3 +28,15 @@ class FAISSStore:
         faiss.write_index(self.index, INDEX_FILE)
         with open(METADATA_FILE, "wb") as f:
             pickle.dump(self.metadata, f)
+
+    def search(self, query_embedding, k=5):
+        query_vector = np.array([query_embedding]).astype("float32")
+
+        distances, indices = self.index.search(query_vector, k)
+
+        results = []
+        for idx in indices[0]:
+            if idx < len(self.metadata):
+                results.append(self.metadata[idx])
+
+        return results
