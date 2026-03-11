@@ -3,6 +3,7 @@ from backend.services.text_extraction import extract_text_from_file
 from backend.services.chunking import chunk_text
 from backend.services.embeddings import generate_embeddings
 
+
 router = APIRouter()
 
 
