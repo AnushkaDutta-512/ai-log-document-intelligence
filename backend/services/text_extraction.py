@@ -1,38 +1,29 @@
-from pathlib import Path
+import os
 from pypdf import PdfReader
-
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
-# points to ai-log-document-intelligence/
-
+from fastapi import HTTPException
 
 def extract_text_from_file(file_path: str) -> str:
-    full_path = BASE_DIR / file_path
-    extension = full_path.suffix.lower()
+    """Extracts text from PDF, TXT, or LOG files."""
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail="File not found")
 
-    if not full_path.exists():
-        raise FileNotFoundError(f"File not found: {full_path}")
+    ext = os.path.splitext(file_path)[1].lower()
+    text = ""
 
-    if extension in [".txt", ".log"]:
-        return _extract_from_text_file(full_path)
+    try:
+        if ext == ".pdf":
+            reader = PdfReader(file_path)
+            for page in reader.pages:
+                text += page.extract_text() + "\n"
+        elif ext in {".txt", ".log"}:
+            with open(file_path, "r", encoding="utf-8") as f:
+                text = f.read()
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported file type for extraction")
+    except Exception as e:
+         raise HTTPException(status_code=500, detail=f"Error extracting text: str({e})")
 
-    if extension == ".pdf":
-        return _extract_from_pdf(full_path)
-
-    raise ValueError("Unsupported file type for extraction")
-
-
-def _extract_from_text_file(path: Path) -> str:
-    with open(path, "r", encoding="utf-8", errors="ignore") as f:
-        return f.read()
-
-
-def _extract_from_pdf(path: Path) -> str:
-    reader = PdfReader(path)
-    text = []
-
-    for page in reader.pages:
-        page_text = page.extract_text()
-        if page_text:
-            text.append(page_text)
-
-    return "\n".join(text)
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="Extracted text is empty")
+        
+    return text.strip()

@@ -1,26 +1,25 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from backend.utils.validators import validate_file
+from fastapi import APIRouter, UploadFile, File, Depends
+from backend.utils.validators import validate_file_extension, validate_file_size, UploadResponse
 from backend.services.file_ingestion import save_uploaded_file
 
-router = APIRouter()
+router = APIRouter(prefix="/upload", tags=["Upload"])
 
-
-@router.post("/upload")
+@router.post("/", response_model=UploadResponse)
 async def upload_document(file: UploadFile = File(...)):
-    try:
-        content = await file.read()
-        validate_file(file.filename, len(content))
-
-        # Reset file pointer after reading
-        file.file.seek(0)
-
-        file_path = save_uploaded_file(file)
-
-        return {
-            "message": "File uploaded successfully",
-            "filename": file.filename,
-            "path": file_path
-        }
-
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    """Uploads a log or document file."""
+    validate_file_extension(file.filename)
+    # validate_file_size needs file length, but UploadFile doesn't expose it directly easily without reading.
+    # We could do a basic check by seeking, but for simplicity, we omit the strict strict size check
+    # if it's not strictly necessary. Let's do a basic size check:
+    file.file.seek(0, 2)
+    size = file.file.tell()
+    validate_file_size(size)
+    file.file.seek(0)
+    
+    file_path = save_uploaded_file(file)
+    
+    return UploadResponse(
+        filename=file.filename,
+        message="File uploaded successfully",
+        file_path=file_path
+    )

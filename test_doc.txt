@@ -1,0 +1,5 @@
+This is a test file for the AI Log & Document Intelligence system.
+It contains some text about RAG and vector databases.
+RAG stands for Retrieval-Augmented Generation.
+SentenceTransformers generate embeddings from text which are stored in FAISS.
+FAISS is a library for efficient similarity search and clustering of dense vectors.

@@ -1,22 +1,21 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
+from pydantic import BaseModel
 from backend.services.text_extraction import extract_text_from_file
 
-router = APIRouter()
+router = APIRouter(prefix="/extract", tags=["Extrac"])
 
+class ExtractRequest(BaseModel):
+    file_path: str
 
-@router.get("/extract")
-def extract_text(file_path: str):
-    try:
-        text = extract_text_from_file(file_path)
+class ExtractResponse(BaseModel):
+    file_path: str
+    text: str
 
-        return {
-            "file_path": file_path,
-            "characters": len(text),
-            "preview": text[:500]
-        }
-
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+@router.post("/", response_model=ExtractResponse)
+async def extract_text(request: ExtractRequest):
+    """Extracts text from a given file path."""
+    text = extract_text_from_file(request.file_path)
+    return ExtractResponse(
+        file_path=request.file_path,
+        text=text
+    )

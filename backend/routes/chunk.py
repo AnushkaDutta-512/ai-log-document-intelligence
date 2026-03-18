@@ -1,24 +1,29 @@
 from fastapi import APIRouter, HTTPException
-from backend.services.text_extraction import extract_text_from_file
+from pydantic import BaseModel
+from typing import List
 from backend.services.chunking import chunk_text
 
-router = APIRouter()
+router = APIRouter(prefix="/chunk", tags=["Chunk"])
 
+class ChunkRequest(BaseModel):
+    text: str
+    filename: str
 
-@router.get("/chunk")
-def chunk_document(file_path: str):
-    try:
-        text = extract_text_from_file(file_path)
-        chunks = chunk_text(text)
+class ChunkResponse(BaseModel):
+    filename: str
+    chunk_count: int
+    chunks: List[str]
 
-        return {
-            "file_path": file_path,
-            "total_chunks": len(chunks),
-            "sample_chunk": chunks[0][:300] if chunks else ""
-        }
-
-    except FileNotFoundError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+@router.post("/", response_model=ChunkResponse)
+async def create_chunks(request: ChunkRequest):
+    """Chunks text into smaller pieces."""
+    if not request.text.strip():
+        raise HTTPException(status_code=400, detail="Text is empty")
+        
+    chunks = chunk_text(request.text, request.filename)
+    
+    return ChunkResponse(
+        filename=request.filename,
+        chunk_count=len(chunks),
+        chunks=chunks
+    )
