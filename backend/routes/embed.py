@@ -1,21 +1,19 @@
 from fastapi import APIRouter, HTTPException
-<<<<<<< HEAD
+
 from pydantic import BaseModel
 from typing import List
-from backend.services.embeddings import generate_embeddings
-=======
+from backend.services.embeddings import generate_embeddings, get_model
 from backend.services.text_extraction import extract_text_from_file
 from backend.services.chunking import chunk_text
-from backend.services.embeddings import generate_embeddings, get_model
 from backend.vector_store.faiss_store import FAISSStore
->>>>>>> 02b64a9c6e824b60744c91a3c174793b3fbe4992
+
 
 router = APIRouter(prefix="/embed", tags=["Embed"])
 
 class EmbedRequest(BaseModel):
     chunks: List[str]
 
-<<<<<<< HEAD
+
 class EmbedResponse(BaseModel):
     chunk_count: int
     embedding_dimension: int
@@ -32,7 +30,7 @@ async def embed_chunks(request: EmbedRequest):
         chunk_count=num_chunks,
         embedding_dimension=dim
     )
-=======
+
 @router.get("/embed")
 def embed_document(file_path: str):
     try:
@@ -41,8 +39,7 @@ def embed_document(file_path: str):
         # Detect file type from extension
         extension = file_path.rsplit(".", 1)[-1].lower()
         file_type = extension if extension in ["pdf", "txt", "log"] else "default"
-
-        chunks = chunk_text(text, file_type=file_type)
+        chunks = chunk_text(text, file_path)
         embeddings = generate_embeddings(chunks, source=file_path)
 
         return {
@@ -95,4 +92,3 @@ def query_documents(question: str, k: int = 5, source: str = None):
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
->>>>>>> 02b64a9c6e824b60744c91a3c174793b3fbe4992

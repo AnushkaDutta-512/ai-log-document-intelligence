@@ -45,4 +45,4 @@ app.mount("/static", StaticFiles(directory="backend/static"), name="static")
 async def serve_ui():
     """Serves the simple frontend UI."""
     with open("backend/static/index.html", "r", encoding="utf-8") as f:
-        return f.read()
+        return HTMLResponse(content=f.read())

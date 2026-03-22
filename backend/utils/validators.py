@@ -12,7 +12,7 @@ def validate_file_extension(filename: str):
     if ext not in ALLOWED_EXTENSIONS:
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported file type. Allowed: {', '.join(ALLOWED_EXTENSIONS)}"
+           detail=f"Unsupported file type. Allowed: {', '.join(sorted(ALLOWED_EXTENSIONS))}"
         )
     return ext
 
