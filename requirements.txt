@@ -1,5 +1,6 @@
 fastapi
 uvicorn
+
 python-multipart
 pypdf
 sentence-transformers
@@ -8,3 +9,10 @@ pydantic
 python-dotenv
 pytest
 httpx
+=======
+pypdf
+sentence-transformers
+faiss-cpu
+numpy
+python-multipart
+>>>>>>> 02b64a9c6e824b60744c91a3c174793b3fbe4992

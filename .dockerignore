@@ -1,6 +1,18 @@
+
 venv/
 __pycache__/
 *.pyc
 .env
 uploaded_files/
 vector_store_data/
+=======
+__pycache__
+*.pyc
+*.pyo
+.env
+.git
+.gitignore
+uploaded_files/
+faiss.index
+metadata.pkl
+>>>>>>> 02b64a9c6e824b60744c91a3c174793b3fbe4992
