@@ -9,7 +9,6 @@ class ChunkRequest(BaseModel):
     text: str
     filename: str
 
-<<<<<<< HEAD
 class ChunkResponse(BaseModel):
     filename: str
     chunk_count: int
@@ -28,7 +27,7 @@ async def create_chunks(request: ChunkRequest):
         chunk_count=len(chunks),
         chunks=chunks
     )
-=======
+
 @router.get("/chunk")
 def chunk_document(file_path: str):
     try:
@@ -52,4 +51,4 @@ def chunk_document(file_path: str):
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
->>>>>>> 02b64a9c6e824b60744c91a3c174793b3fbe4992
+
